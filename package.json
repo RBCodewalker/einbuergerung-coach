@@ -3,19 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.14.0",
     "@mantine/core": "^8.2.5",
     "@mantine/hooks": "^8.2.5",
-    "@tabler/icons-react": "^3.34.1",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.7.0",
-    "framer-motion": "^12.23.12",
     "lucide-react": "^0.540.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,9 +36,14 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/react": "^14.3.1",
-    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.6.1",
-    "ajv": "^8.17.1"
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.3.21",
+    "@types/react-dom": "^18.3.5",
+    "ajv": "^8.17.1",
+    "typescript": "^4.9.5"
   }
 }

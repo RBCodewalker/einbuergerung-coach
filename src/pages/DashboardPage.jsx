@@ -19,8 +19,8 @@ import {
 } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { useQuiz } from "../contexts/QuizContext";
-import * as Icons from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
+import { Clock2, FunnelX, GraduationCap, LibraryBig, ListTodo } from "lucide-react";
 
 export function DashboardPage() {
   const {
@@ -157,7 +157,7 @@ export function DashboardPage() {
         <Group justify="space-between" align="center" mb="sm">
           <Group gap="xs">
             <ThemeIcon size="lg" variant="light">
-              <Icons.IconHelpCircle />
+              <GraduationCap />
             </ThemeIcon>
             <Title order={2} size="h3">
               Modus wählen
@@ -183,7 +183,7 @@ export function DashboardPage() {
                 onClick={handleLearnMode}
                 size="xl"
                 variant="default"
-                leftSection={<Icons.IconBook2 size={18} />}
+                leftSection={<LibraryBig size={18} />}
               >
                 Learn Mode
               </Button>
@@ -201,7 +201,7 @@ export function DashboardPage() {
                 onClick={handleStartQuiz}
                 size="xl"
                 variant="filled"
-                leftSection={<Icons.IconHelpCircle size={18} />}
+                leftSection={<ListTodo size={18} />}
                 disabled={actualQuizSize === 0}
               >
                 Quiz Mode ({actualQuizSize})
@@ -225,7 +225,7 @@ export function DashboardPage() {
             <Stack gap="sm">
               <Group align="center" gap="sm" justify="space-between">
                 <Group gap={6}>
-                  <Icons.IconClock size={16} />
+                  <Clock2 size={16} />
                   <Text size="sm" c="dimmed">
                     Quiz-Dauer (Minuten)
                   </Text>
@@ -242,7 +242,7 @@ export function DashboardPage() {
               <Group align="flex-start" justify="space-between">
                 <Stack gap={2} style={{ flex: 1 }}>
                   <Group gap={6}>
-                    <Icons.IconFilterCog size={16} />
+                    <FunnelX size={16} />
                     <Text size="sm" c="dimmed">
                       Richtige Antworten ausschließen
                     </Text>

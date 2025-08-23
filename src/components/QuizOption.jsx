@@ -1,5 +1,4 @@
 import { Button, Group, Badge, Text } from '@mantine/core';
-import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { ANSWER_LABELS } from '../constants';
 
@@ -12,7 +11,7 @@ export function QuizOption({
   onSelect 
 }) {
   return (
-    <motion.div whileTap={{ scale: 0.98 }}>
+    <div style={{ transform: 'scale(1)', transition: 'transform 0.1s ease' }}>
       <Button
         onClick={() => onSelect(index)}
         variant={isSelected ? (isCorrect ? 'light' : 'light') : 'default'}
@@ -21,7 +20,14 @@ export function QuizOption({
         fullWidth
         p="md"
         h="auto"
-        style={{ textAlign: 'left' }}
+        style={{ 
+          textAlign: 'left',
+          transform: 'scale(1)',
+          transition: 'transform 0.1s ease'
+        }}
+        onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
+        onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
         <Group gap="md" w="100%">
           <Badge
@@ -37,6 +43,6 @@ export function QuizOption({
           )}
         </Group>
       </Button>
-    </motion.div>
+    </div>
   );
 }
