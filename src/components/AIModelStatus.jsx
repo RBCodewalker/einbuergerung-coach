@@ -1,7 +1,8 @@
 import React from 'react';
-import { Alert, Progress, Text, Group, ThemeIcon } from '@mantine/core';
-import { Brain, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Alert, Progress, Text, Group, ThemeIcon, Button } from '@mantine/core';
+import { Brain, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useAI } from '../contexts/AIContext';
+import { aiExplanationService } from '../services/aiExplanations';
 
 export function AIModelStatus() {
   const { isModelLoading, isModelReady, loadingProgress, loadingError, isMobile } = useAI();
@@ -52,6 +53,15 @@ export function AIModelStatus() {
 
   // Error state
   if (loadingError) {
+    const handleRetry = async () => {
+      try {
+        await aiExplanationService.initialize(true); // Force retry
+        window.location.reload(); // Reload to reset state
+      } catch (error) {
+        console.log('Retry failed:', error);
+      }
+    };
+
     return (
       <Alert
         variant="light"
@@ -60,7 +70,18 @@ export function AIModelStatus() {
         title="KI-Modell nicht verfügbar"
         mb="md"
       >
-        <Text size="sm">{loadingError}</Text>
+        <Text size="sm" mb="sm">{loadingError}</Text>
+        {isMobile && (
+          <Button
+            size="xs"
+            variant="light"
+            color="yellow"
+            leftSection={<RefreshCw size={14} />}
+            onClick={handleRetry}
+          >
+            Erneut versuchen
+          </Button>
+        )}
       </Alert>
     );
   }

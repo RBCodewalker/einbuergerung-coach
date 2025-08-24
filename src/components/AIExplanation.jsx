@@ -162,7 +162,7 @@ export function AIExplanation({
       withBorder
       p="md"
       radius="md"
-      bg="gray.0"
+      bg="light-dark(gray.0, var(--mantine-color-dark-9))"
       style={{ marginTop: "1rem" }}
     >
       <Group justify="space-between" align="center" mb="sm">
@@ -259,7 +259,7 @@ export function AIExplanation({
 
       {explanation && !isLoading && (
         <>
-          <Paper p="sm" bg="white" radius="sm" withBorder>
+          <Paper p="sm" bg="white, var(--mantine-color-gray-9))" radius="sm" withBorder>
             <Group justify="space-between" align="flex-start" mb="xs">
               <Text size="sm" lh={1.6} style={{ flex: 1 }}>
                 {explanation}

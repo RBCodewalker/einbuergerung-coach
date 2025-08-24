@@ -109,7 +109,7 @@ export function StateToggle() {
               onClick={() => handleStateClick(state.key, state.name)}
               style={{ 
                 fontWeight: state.key === selectedState ? 600 : 400,
-                backgroundColor: state.key === selectedState ? 'var(--mantine-color-blue-0)' : undefined
+                backgroundColor: state.key === selectedState ? 'light-dark(var(--mantine-color-blue-1), var(--mantine-color-blue-9))' : undefined
               }}
             >
               {state.name}

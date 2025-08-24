@@ -65,7 +65,7 @@ export function AIProvider({ children }) {
         console.error('Failed to initialize AI model:', error);
         
         const errorMessage = isMobile
-          ? 'KI-Funktionen sind auf Mobilgeräten möglicherweise nicht verfügbar. Die App funktioniert weiterhin ohne KI-Erklärungen.'
+          ? 'KI-Modell benötigt WebAssembly und ausreichende Geräte-Ressourcen. Einige mobile Browser unterstützen möglicherweise nicht alle erforderlichen Funktionen. Die App funktioniert weiterhin ohne KI-Erklärungen.'
           : 'KI-Modell konnte nicht geladen werden. Die App funktioniert weiterhin ohne KI-Erklärungen.';
         
         setLoadingError(errorMessage);
