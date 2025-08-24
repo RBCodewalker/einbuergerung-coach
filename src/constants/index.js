@@ -1,4 +1,4 @@
-export const QUESTIONS_URL = `${process.env.PUBLIC_URL}/LiDData.json`;
+export const QUESTIONS_URL = `${process.env.PUBLIC_URL}/json/LiDData.json`;
 
 export const QUIZ_COUNT = 33;
 

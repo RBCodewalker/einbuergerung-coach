@@ -18,6 +18,7 @@ import { QuizOption } from '../components/QuizOption';
 import { getImageSrc } from '../utils/images';
 import { TIMER_WARNING_THRESHOLD } from '../constants';
 import { getQuestionCategory } from '../utils/categories';
+import { AIExplanation } from '../components/AIExplanation';
 
 export function QuizPage() {
   const navigate = useNavigate();
@@ -36,7 +37,8 @@ export function QuizPage() {
     toggleFlag,
     setShowReview,
     completeQuiz,
-    excludeCorrect
+    excludeCorrect,
+    selectedState
   } = useQuiz();
 
   const handleNext = () => {
@@ -127,7 +129,7 @@ export function QuizPage() {
         
         {currentQA.image && (
           <Image
-            src={getImageSrc(currentQA)}
+            src={getImageSrc(currentQA, selectedState)}
             alt="Question Image"
             mah={300}
             fit="contain"
@@ -149,6 +151,17 @@ export function QuizPage() {
             />
           ))}
         </Stack>
+
+        {/* AI Explanation - only show if user has answered */}
+        {answers[current] !== -1 && (
+          <AIExplanation
+            question={currentQA}
+            options={currentQA.options}
+            correctIndex={currentQA.answerIndex}
+            userIndex={answers[current]}
+            disabled={false}
+          />
+        )}
 
         <Group justify="space-between" mt="lg">
           <Group gap="sm">

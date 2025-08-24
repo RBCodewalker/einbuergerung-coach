@@ -3,7 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import { AppProvider, useApp } from './contexts/AppContext';
 import { QuizProvider } from './contexts/QuizContext';
+import { AIProvider } from './contexts/AIContext';
 import { ThemeToggle } from './components/ui/ThemeToggle';
+import { HomeButton } from './components/ui/HomeButton';
+import { StateToggle } from './components/StateToggle';
 import { ConsentPage } from './pages/ConsentPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ReviewCorrectPage } from './pages/ReviewCorrectPage';
@@ -12,7 +15,6 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { LearnPageWrapper } from './components/routing/LearnPageWrapper';
 import { QuizPageWrapper } from './components/routing/QuizPageWrapper';
 import { QuizReviewWrapper } from './components/routing/QuizReviewWrapper';
-import { HomeButton } from './components/ui/HomeButton';
 
 function AppContent() {
   const { consent } = useApp();
@@ -36,7 +38,10 @@ function AppContent() {
     >
       <Group justify="space-between" align="center" mb="xl" wrap="wrap">
         <HomeButton />
-        <ThemeToggle />
+        <Group gap="sm">
+          <StateToggle />
+          <ThemeToggle />
+        </Group>
       </Group>
 
       <Routes>
@@ -70,9 +75,11 @@ function App() {
   return (
     <Router>
       <AppProvider>
-        <QuizProvider>
-          <AppContent />
-        </QuizProvider>
+        <AIProvider>
+          <QuizProvider>
+            <AppContent />
+          </QuizProvider>
+        </AIProvider>
       </AppProvider>
     </Router>
   );

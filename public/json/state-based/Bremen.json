@@ -1,0 +1,112 @@
+[
+  {
+    "question": "Welches Wappen gehört zur Freien Hansestadt Bremen?",
+    "options": [
+      "Bild 1",
+      "Bild 2",
+      "Bild 3",
+      "Bild 4"
+    ],
+    "image": true,
+    "answerIndex": 2
+  },
+  {
+    "question": "Welches ist ein Stadtteil von Bremen?",
+    "options": [
+      "Altona",
+      "Hemelingen",
+      "Pankow",
+      "Babelsberg"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Für wie viele Jahre wird das Landesparlament in Bremen gewählt?",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Ab welchem Alter darf man in Bremen bei den Wahlen zur Bürgerschaft (Landtag) wählen?",
+    "options": [
+      "14",
+      "16",
+      "18",
+      "20"
+    ],
+    "image": false,
+    "answerIndex": 2
+  },
+  {
+    "question": "Welche Farben hat die Landesflagge von Bremen?",
+    "options": [
+      "blau-weiß-rot",
+      "rot-weiß",
+      "grün-weiß-rot",
+      "schwarz-gold"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Wo können Sie sich in Bremen über politische Themen informieren?",
+    "options": [
+      "beim Ordnungsamt der Gemeinde",
+      "bei der Landeszentrale für politische Bildung",
+      "bei den Kirchen",
+      "bei der Verbraucherzentrale"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Was ist ein deutscher Stadtstaat?",
+    "options": [
+      "Bremen",
+      "München",
+      "Frankfurt",
+      "Erfurt"
+    ],
+    "image": false,
+    "answerIndex": 0
+  },
+  {
+    "question": "Welches Bundesland ist Bremen?",
+    "options": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "image": true,
+    "answerIndex": 0
+  },
+  {
+    "question": "Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Bremen?",
+    "options": [
+      "Ministerpräsidentin/Ministerpräsident",
+      "Erste Bürgermeisterin/Erster Bürgermeister",
+      "Präsidentin/Präsident des Senates",
+      "Regierende Bürgermeisterin/Regierender Bürgermeister"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Welche Senatorin/welchen Senator hat Bremen nicht?",
+    "options": [
+      "Senatorin/Senator für Außenbeziehungen",
+      "Finanzsenatorin/Finanzsenator",
+      "Justizsenatorin/Justizsenator",
+      "Innensenatorin/Innensenator"
+    ],
+    "image": false,
+    "answerIndex": 0
+  }
+]

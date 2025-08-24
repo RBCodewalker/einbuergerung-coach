@@ -1,0 +1,112 @@
+[
+  {
+    "question": "Welches Wappen gehört zum Bundesland Berlin?",
+    "options": [
+      "Bild 1",
+      "Bild 2",
+      "Bild 3",
+      "Bild 4"
+    ],
+    "image": true,
+    "answerIndex": 3
+  },
+  {
+    "question": "Welches ist ein Bezirk von Berlin?",
+    "options": [
+      "Altona",
+      "Prignitz",
+      "Pankow",
+      "Mecklenburgische Seenplatte"
+    ],
+    "image": false,
+    "answerIndex": 2
+  },
+  {
+    "question": "Für wie viele Jahre wird das Landesparlament in Berlin gewählt?",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "image": false,
+    "answerIndex": 2
+  },
+  {
+    "question": "Ab welchem Alter darf man in Berlin bei Kommunalwahlen (Wahl der Bezirksverordnetenversammlung) wählen?",
+    "options": [
+      "14",
+      "16",
+      "18",
+      "20"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Welche Farben hat die Landesflagge von Berlin?",
+    "options": [
+      "blau-weiß-rot",
+      "weiß-rot",
+      "grün-weiß-rot",
+      "schwarz-gold"
+    ],
+    "image": false,
+    "answerIndex": 1
+  },
+  {
+    "question": "Wo können Sie sich in Berlin über politische Themen informieren?",
+    "options": [
+      "beim Ordnungsamt der Gemeinde",
+      "bei den Kirchen",
+      "bei der Verbraucherzentrale",
+      "bei der Landeszentrale für politische Bildung"
+    ],
+    "image": false,
+    "answerIndex": 3
+  },
+  {
+    "question": "Welches Bundesland ist ein Stadtstaat?",
+    "options": [
+      "Berlin",
+      "Saarland",
+      "Brandenburg",
+      "Hessen"
+    ],
+    "image": false,
+    "answerIndex": 0
+  },
+  {
+    "question": "Welches Bundesland ist Berlin?",
+    "options": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "image": true,
+    "answerIndex": 3
+  },
+  {
+    "question": "Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Berlin?",
+    "options": [
+      "Ministerpräsidentin/Ministerpräsident",
+      "Oberbürgermeisterin/Oberbürgermeister",
+      "Präsidentin/Präsident des Senates",
+      "Regierende Bürgermeisterin/Regierender Bürgermeister"
+    ],
+    "image": false,
+    "answerIndex": 3
+  },
+  {
+    "question": "Welche Senatorin/welchen Senator hat Berlin nicht?",
+    "options": [
+      "Finanzsenatorin/Finanzsenator",
+      "Innensenatorin/Innensenator",
+      "Senatorin/Senator für Außenbeziehungen",
+      "Justizsenatorin/Justizsenator"
+    ],
+    "image": false,
+    "answerIndex": 2
+  }
+]
