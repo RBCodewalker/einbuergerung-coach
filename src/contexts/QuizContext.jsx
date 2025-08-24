@@ -3,6 +3,7 @@ import { useCookieState } from '../hooks/useCookieState';
 import { useQuizData } from '../hooks/useQuizData';
 import { useQuizTimer } from '../hooks/useQuizTimer';
 import { useApp } from './AppContext';
+import { loadStateQuestions, getRandomStateQuestions, DEFAULT_STATE } from '../utils/stateQuestions';
 
 const QuizContext = createContext();
 
@@ -27,6 +28,25 @@ export function QuizProvider({ children }) {
   const [showReview, setShowReview] = useState(false);
   const [quizDuration, setQuizDuration] = useCookieState('lid.quizDuration', 0, cookiesEnabled); // in minutes
   const [excludeCorrect, setExcludeCorrect] = useCookieState('lid.excludeCorrect', false, cookiesEnabled);
+  const [selectedState, setSelectedState] = useCookieState('lid.selectedState', DEFAULT_STATE, cookiesEnabled);
+  const [stateQuestions, setStateQuestions] = useState([]);
+
+  // Load state questions when selectedState changes (always load since we always have a default state)
+  useEffect(() => {
+    const loadState = async () => {
+      try {
+        const questions = await loadStateQuestions(selectedState);
+        setStateQuestions(questions);
+      } catch (error) {
+        console.error('Failed to load state questions:', error);
+        setStateQuestions([]);
+      }
+    };
+    
+    if (selectedState) {
+      loadState();
+    }
+  }, [selectedState]);
 
   // Stats
   const statsInit = { 
@@ -40,12 +60,70 @@ export function QuizProvider({ children }) {
   };
   const [stats, setStats] = useCookieState('lid.stats', statsInit, cookiesEnabled);
 
-  // Quiz questions
+  // Clean up any existing duplicates between correctAnswers and incorrectAnswers
+  useEffect(() => {
+    if (stats && (stats.correctAnswers || stats.incorrectAnswers)) {
+      const correctIds = Object.keys(stats.correctAnswers || {});
+      const incorrectIds = Object.keys(stats.incorrectAnswers || {});
+      const duplicates = correctIds.filter(id => incorrectIds.includes(id));
+      
+      if (duplicates.length > 0) {
+        console.log(`🔧 Cleaning up ${duplicates.length} duplicate question(s) in stats:`, duplicates);
+        setStats(prevStats => {
+          const newCorrectAnswers = { ...prevStats.correctAnswers };
+          const newIncorrectAnswers = { ...prevStats.incorrectAnswers };
+          
+          // Remove duplicates from incorrectAnswers (keep in correct since that's the latest state)
+          duplicates.forEach(id => {
+            delete newIncorrectAnswers[id];
+          });
+          
+          return {
+            ...prevStats,
+            correctAnswers: newCorrectAnswers,
+            incorrectAnswers: newIncorrectAnswers
+          };
+        });
+      }
+    }
+  }, [stats?.correctAnswers, stats?.incorrectAnswers, setStats]);
+
+  // Quiz questions with state integration - always 33 total (30 general + 3 state for quiz mode)
+  // CRITICAL BUG FIX: Never change quiz questions during an active quiz session
   const quizSet = useMemo(() => {
-    const correctAnswersToExclude = excludeCorrect ? stats?.correctAnswers || {} : {};
-    return getQuizSet(quizSeed, correctAnswersToExclude);
-  }, [getQuizSet, quizSeed, excludeCorrect, stats?.correctAnswers]);
-  const questions = mode === 'quiz' ? quizSet : learnSet;
+    // When in quiz mode, use the correctAnswers state from when quiz was STARTED, not current
+    // This prevents questions from jumping when user selects answers during quiz
+    const shouldExcludeCorrect = excludeCorrect && mode !== 'quiz';
+    const correctAnswersToExclude = shouldExcludeCorrect ? stats?.correctAnswers || {} : {};
+    const baseQuizSet = getQuizSet(quizSeed, correctAnswersToExclude);
+    
+    // Always include state questions when available
+    if (stateQuestions.length > 0) {
+      // Only filter state questions if we're not in quiz mode
+      const availableStateQuestions = shouldExcludeCorrect 
+        ? stateQuestions.filter(q => !correctAnswersToExclude[q.id])
+        : stateQuestions;
+      
+      // Get 3 random state questions for quiz mode
+      const selectedStateQuestions = getRandomStateQuestions(availableStateQuestions, 3);
+      
+      // Combine: take 30 regular questions + 3 state questions = 33 total
+      const regularQuestions = baseQuizSet.slice(0, Math.max(0, 33 - selectedStateQuestions.length));
+      return [...regularQuestions, ...selectedStateQuestions];
+    }
+    
+    return baseQuizSet;
+  }, [getQuizSet, quizSeed, excludeCorrect, mode, ...(mode !== 'quiz' ? [stats?.correctAnswers] : []), stateQuestions]);
+  
+  // Enhanced learn set that includes ALL state questions (always 310 total: 300 general + 10 state)
+  const enhancedLearnSet = useMemo(() => {
+    if (stateQuestions.length > 0) {
+      return [...learnSet, ...stateQuestions];
+    }
+    return learnSet;
+  }, [learnSet, stateQuestions]);
+  
+  const questions = mode === 'quiz' ? quizSet : enhancedLearnSet;
   const currentQA = questions[current];
   const progress = questions.length ? ((current + 1) / questions.length) * 100 : 0;
 
@@ -84,18 +162,28 @@ export function QuizProvider({ children }) {
     const isNextCorrect = answerIndex === currentQA.answerIndex;
 
     if (prev === -1) {
-      setStats(s => ({
-        ...s,
-        attempted: { ...s.attempted, [currentQA.id]: true },
-        correct: s.correct + (isNextCorrect ? 1 : 0),
-        wrong: s.wrong + (!isNextCorrect ? 1 : 0),
-        correctAnswers: isNextCorrect 
-          ? { ...s.correctAnswers, [currentQA.id]: true }
-          : { ...s.correctAnswers },
-        incorrectAnswers: !isNextCorrect 
-          ? { ...s.incorrectAnswers, [currentQA.id]: answerIndex }
-          : { ...s.incorrectAnswers }
-      }));
+      // First time answering this question - ensure mutual exclusivity
+      setStats(s => {
+        const newCorrectAnswers = { ...s.correctAnswers };
+        const newIncorrectAnswers = { ...s.incorrectAnswers };
+        
+        if (isNextCorrect) {
+          newCorrectAnswers[currentQA.id] = true;
+          delete newIncorrectAnswers[currentQA.id]; // Remove from incorrect if exists
+        } else {
+          newIncorrectAnswers[currentQA.id] = answerIndex;
+          delete newCorrectAnswers[currentQA.id]; // Remove from correct if exists
+        }
+        
+        return {
+          ...s,
+          attempted: { ...s.attempted, [currentQA.id]: true },
+          correct: s.correct + (isNextCorrect ? 1 : 0),
+          wrong: s.wrong + (!isNextCorrect ? 1 : 0),
+          correctAnswers: newCorrectAnswers,
+          incorrectAnswers: newIncorrectAnswers
+        };
+      });
     } else if (isPrevCorrect !== isNextCorrect) {
       setStats(s => {
         const newCorrectAnswers = { ...s.correctAnswers };
@@ -148,6 +236,31 @@ export function QuizProvider({ children }) {
     }));
   };
 
+  // Helper function to ensure stats integrity and mutual exclusivity
+  const validateAndCleanStats = (stats) => {
+    const correctIds = Object.keys(stats.correctAnswers || {});
+    const incorrectIds = Object.keys(stats.incorrectAnswers || {});
+    const duplicates = correctIds.filter(id => incorrectIds.includes(id));
+    
+    if (duplicates.length > 0) {
+      const newCorrectAnswers = { ...stats.correctAnswers };
+      const newIncorrectAnswers = { ...stats.incorrectAnswers };
+      
+      // Remove duplicates from incorrectAnswers (prioritize correct answers as latest state)
+      duplicates.forEach(id => {
+        delete newIncorrectAnswers[id];
+      });
+      
+      return {
+        ...stats,
+        correctAnswers: newCorrectAnswers,
+        incorrectAnswers: newIncorrectAnswers
+      };
+    }
+    
+    return stats;
+  };
+
   const startNewQuiz = () => {
     setQuizSeed(Date.now());
     setMode('quiz');
@@ -187,6 +300,7 @@ export function QuizProvider({ children }) {
   const value = {
     // Data
     learnSet,
+    enhancedLearnSet, // Include the enhanced learn set with state questions
     questions,
     currentQA,
     
@@ -203,7 +317,11 @@ export function QuizProvider({ children }) {
     setQuizDuration,
     excludeCorrect,
     setExcludeCorrect,
+    selectedState,
+    setSelectedState,
+    stateQuestions,
     stats,
+    setStats,
     progress,
     remaining,
     formatTime,

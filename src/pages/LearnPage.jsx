@@ -4,7 +4,7 @@ import { useQuiz } from '../contexts/QuizContext';
 import { LearnBrowser } from '../components/LearnBrowser';
 
 export function LearnPage() {
-  const { learnSet } = useQuiz();
+  const { enhancedLearnSet } = useQuiz();
   const navigate = useNavigate();
 
   return (
@@ -20,7 +20,7 @@ export function LearnPage() {
           Zurück
         </Button>
       </Group>
-      <LearnBrowser data={learnSet} />
+      <LearnBrowser data={enhancedLearnSet} />
     </Paper>
   );
 }

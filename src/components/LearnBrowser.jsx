@@ -4,10 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getImageSrc } from '../utils/images';
 import { ANSWER_LABELS } from '../constants';
 import { getQuestionCategory } from '../utils/categories';
+import { AIExplanation } from './AIExplanation';
+import { useQuiz } from '../contexts/QuizContext';
 
 export function LearnBrowser({ data }) {
   const navigate = useNavigate();
   const { questionIndex } = useParams();
+  const { selectedState } = useQuiz();
   const currentIndex = parseInt(questionIndex, 10) - 1; // Convert from 1-based to 0-based
   const currentQuestion = data[currentIndex];
 
@@ -85,7 +88,7 @@ export function LearnBrowser({ data }) {
         
         {currentQuestion.image && (
           <Image
-            src={getImageSrc(currentQuestion)}
+            src={getImageSrc(currentQuestion, selectedState)}
             alt="Question Image"
             mah={300}
             fit="contain"
@@ -124,7 +127,16 @@ export function LearnBrowser({ data }) {
             </Text>
           </Paper>
         ))}
-      </Stack>
+        </Stack>
+
+        {/* AI Explanation for learn mode */}
+        <AIExplanation
+          question={currentQuestion}
+          options={currentQuestion.options}
+          correctIndex={currentQuestion.answerIndex}
+          userIndex={null} // No user selection in learn mode
+          disabled={false}
+        />
       </Stack>
     </Stack>
   );

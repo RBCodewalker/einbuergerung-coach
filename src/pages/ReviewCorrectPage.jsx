@@ -15,7 +15,7 @@ import { getQuestionCategory } from '../utils/categories';
 import { getImageSrc } from '../utils/images';
 
 export function ReviewCorrectPage() {
-  const { learnSet, stats } = useQuiz();
+  const { learnSet, stats, selectedState } = useQuiz();
   const navigate = useNavigate();
 
   // Get questions that were answered correctly
@@ -92,7 +92,7 @@ export function ReviewCorrectPage() {
                 
                 {question.image && (
                   <Image
-                    src={getImageSrc(question)}
+                    src={getImageSrc(question, selectedState)}
                     alt="Question Image"
                     mah={300}
                     fit="contain"

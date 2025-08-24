@@ -21,10 +21,12 @@ import { useNavigate } from "react-router-dom";
 import { useQuiz } from "../contexts/QuizContext";
 import { useMediaQuery } from "@mantine/hooks";
 import { Clock2, FunnelX, GraduationCap, LibraryBig, ListTodo } from "lucide-react";
+import { AIModelStatus } from "../components/AIModelStatus";
 
 export function DashboardPage() {
   const {
     learnSet,
+    enhancedLearnSet,
     stats,
     startNewQuiz,
     quizDuration,
@@ -47,15 +49,19 @@ export function DashboardPage() {
     navigate("/learn/1");
   };
 
-  // Calculate available questions for quiz
+  // Calculate available questions for quiz (use enhanced learn set for total count)
+  const totalQuestions = enhancedLearnSet?.length || learnSet.length;
   const availableQuestionsCount = excludeCorrect
-    ? learnSet.filter((q) => !stats?.correctAnswers?.[q.id]).length
-    : learnSet.length;
+    ? (enhancedLearnSet || learnSet).filter((q) => !stats?.correctAnswers?.[q.id]).length
+    : totalQuestions;
 
   const actualQuizSize = Math.min(33, availableQuestionsCount);
 
   return (
     <Stack gap="xl">
+      {/* AI Model Status */}
+      <AIModelStatus />
+      
       {/* Branding Section */}
       <Center>
         <Stack gap={{ base: "md", sm: "lg", md: "xl" }} align="center">
@@ -109,13 +115,14 @@ export function DashboardPage() {
         <Grid style={{ textAlign: "center" }}>
           <Grid.Col span={{ base: 12, md: 4 }}>
             <Text size="clamp(2rem, 8vw, 3rem)" fw={700} lh={1}>
-              {Object.keys(stats.attempted).length}/{learnSet.length}
+              {Object.keys(stats.attempted).length}/{totalQuestions}
             </Text>
             <Text size="clamp(0.7rem, 3vw, 1.2rem)" c="dimmed">Fragen gequizzt</Text>
           </Grid.Col>
           <Tooltip
-            label={ stats.correct > 0 && "Richtig beantwortete Fragen überprüfen." }
+            label={ "Richtig beantwortete Fragen überprüfen." }
             withArrow
+            events={stats.correct > 0 ? undefined : { hover: false, focus: false, touch: false }}
           >
             <Grid.Col span={{ base: 12, md: 4 }}>
               <Box
@@ -132,8 +139,9 @@ export function DashboardPage() {
             </Grid.Col>
           </Tooltip>
           <Tooltip
-            label={ stats.wrong > 0 && "Falsch beantwortete Fragen überprüfen." }
+            label={ "Falsch beantwortete Fragen überprüfen." }
             withArrow
+            events={stats.wrong > 0 ? undefined : { hover: false, focus: false, touch: false }}
           >
             <Grid.Col span={{ base: 12, md: 4 }}>
               <Box
@@ -268,6 +276,7 @@ export function DashboardPage() {
                   🎉 Alle Fragen richtig beantwortet! Nichts mehr zu quizen.
                 </Text>
               )}
+
             </Stack>
           </Fieldset>
         </Group>

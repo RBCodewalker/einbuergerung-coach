@@ -17,7 +17,7 @@ import { getQuestionCategory } from '../utils/categories';
 import { getImageSrc } from '../utils/images';
 
 export function ReviewIncorrectPage() {
-  const { learnSet, stats, markAsLearned, unmarkAsLearned } = useQuiz();
+  const { learnSet, stats, markAsLearned, unmarkAsLearned, selectedState } = useQuiz();
   const navigate = useNavigate();
   const [showLearned, setShowLearned] = useState(false);
 
@@ -140,7 +140,7 @@ export function ReviewIncorrectPage() {
                   
                   {question.image && (
                     <Image
-                      src={getImageSrc(question)}
+                      src={getImageSrc(question, selectedState)}
                       alt="Question Image"
                       mah={300}
                       fit="contain"

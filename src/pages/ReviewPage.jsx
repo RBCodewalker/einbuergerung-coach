@@ -23,7 +23,8 @@ export function ReviewPage() {
     questions, 
     answers, 
     scoreSummary, 
-    startNewQuiz 
+    startNewQuiz,
+    selectedState
   } = useQuiz();
 
   const handleStartNewQuiz = () => {
@@ -111,7 +112,7 @@ export function ReviewPage() {
               
               {question.image && (
                 <Image
-                  src={getImageSrc(question)}
+                  src={getImageSrc(question, selectedState)}
                   alt="Question Image"
                   mah={240}
                   fit="contain"
@@ -130,7 +131,7 @@ export function ReviewPage() {
                       j === question.answerIndex
                         ? 'light-dark(var(--mantine-color-emerald-1), var(--mantine-color-emerald-9))'
                         : j === answers[i] && j !== question.answerIndex
-                        ? 'light-dark(var(--mantine-color-red-1), var(--mantine-color-red-9)))'
+                        ? 'light-dark(var(--mantine-color-red-1), var(--mantine-color-red-9))'
                         : undefined
                     }
                   >
