@@ -6,6 +6,26 @@ class AIExplanationService {
     this.isLoading = false;
     this.isInitialized = false;
     this.initializationPromise = null;
+    this.isMobile = this.detectMobile();
+    this.initializationProgress = 0;
+  }
+
+  detectMobile() {
+    // Detect mobile devices
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileUA = /android|iPhone|iPad|iPod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 768;
+    
+    return isMobileUA || (isTouchDevice && isSmallScreen);
+  }
+
+  get initializationProgress() {
+    return this._initializationProgress || 0;
+  }
+
+  set initializationProgress(value) {
+    this._initializationProgress = value;
   }
 
   async initialize() {
@@ -25,22 +45,32 @@ class AIExplanationService {
     if (this.isLoading) return;
 
     this.isLoading = true;
-    console.log("🚀 Starting WebLLM initialization...");
+    this.initializationProgress = 0;
+    console.log("🚀 Starting WebLLM initialization...", { isMobile: this.isMobile });
+
+    // Check if WebLLM is supported on this device
+    if (this.isMobile) {
+      console.warn("📱 Mobile device detected - WebLLM may have limited support");
+    }
 
     try {
       // Reset state
       this.engine = null;
       this.isInitialized = false;
 
-      // Try different models in order of preference
-      const models = [
-        "gemma-2b-it-q4f32_1-MLC", // Very small Gemma model (preferred)
-        "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC", // Alternative TinyLlama
-        "Qwen2-0.5B-Instruct-q4f16_1-MLC", // Even smaller Qwen model
+      // Use smaller models for mobile devices
+      const models = this.isMobile ? [
+        "Qwen2-0.5B-Instruct-q4f16_1-MLC", // Smallest model for mobile
+        "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC", // Backup for mobile
+      ] : [
+        "gemma-2b-it-q4f32_1-MLC", // Desktop preferred
+        "TinyLlama-1.1B-Chat-v0.4-q4f32_1-MLC", // Alternative
+        "Qwen2-0.5B-Instruct-q4f16_1-MLC", // Smallest as fallback
       ];
 
       const initProgressCallback = (report) => {
-        console.log("📥 WebLLM loading progress:", report.text);
+        this.initializationProgress = report.progress || 0;
+        console.log("📥 WebLLM loading progress:", report.text, `${this.initializationProgress}%`);
       };
 
       // Try models in order until one works
@@ -50,13 +80,22 @@ class AIExplanationService {
 
           this.engine = new webllm.MLCEngine();
 
-          await this.engine.reload(modelId, {
+          // Add mobile-specific timeout and error handling
+          const reloadPromise = this.engine.reload(modelId, {
             initProgressCallback: initProgressCallback,
             config: {
               model_url: undefined, // Let WebLLM handle the URL
               use_cache: true,
             },
           });
+
+          // Mobile devices need longer timeout
+          const timeoutMs = this.isMobile ? 60000 : 30000; // 60s for mobile, 30s for desktop
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Model loading timeout after ${timeoutMs/1000}s`)), timeoutMs)
+          );
+
+          await Promise.race([reloadPromise, timeoutPromise]);
 
           // Verify the engine is working with a test
           console.log("🧪 Testing model functionality...");
@@ -78,20 +117,37 @@ class AIExplanationService {
         } catch (modelError) {
           console.warn(
             `❌ Failed to load/test ${modelId}:`,
-            modelError.message
+            modelError.message,
+            { isMobile: this.isMobile }
           );
           this.engine = null;
+          
+          // On mobile, provide more specific error context
+          if (this.isMobile && modelError.message.includes('timeout')) {
+            console.warn("📱 Mobile timeout - this is common on mobile devices with limited resources");
+          }
+          
           continue;
         }
       }
 
       if (!this.isInitialized) {
-        throw new Error("All models failed to load or test");
+        const errorMsg = this.isMobile 
+          ? "AI models failed to load on mobile device - this feature may not be available on your device"
+          : "All AI models failed to load or test";
+        throw new Error(errorMsg);
       }
     } catch (error) {
       console.error("🚨 Failed to initialize any WebLLM model:", error);
       this.isInitialized = false;
       this.engine = null;
+      this.initializationProgress = 0;
+      
+      // Provide mobile-specific error context
+      if (this.isMobile) {
+        console.warn("📱 Mobile device may not support WebLLM - this is a known limitation");
+      }
+      
       throw error;
     } finally {
       this.isLoading = false;

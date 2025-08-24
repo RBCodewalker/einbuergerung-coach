@@ -4,7 +4,7 @@ import { Brain, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useAI } from '../contexts/AIContext';
 
 export function AIModelStatus() {
-  const { isModelLoading, isModelReady, loadingProgress, loadingError } = useAI();
+  const { isModelLoading, isModelReady, loadingProgress, loadingError, isMobile } = useAI();
 
   // Don't show anything if model is ready and no error
   if (isModelReady && !loadingError && !loadingProgress) {
@@ -26,7 +26,10 @@ export function AIModelStatus() {
         </Group>
         <Progress value={loadingProgress.includes('%') ? parseInt(loadingProgress) : undefined} animated />
         <Text size="xs" c="dimmed" mt="xs">
-          Dies kann beim ersten Besuch bis zu einer Minute dauern.
+          {isMobile 
+            ? "Auf Mobilgeräten kann dies länger dauern oder möglicherweise nicht funktionieren."
+            : "Dies kann beim ersten Besuch bis zu einer Minute dauern."
+          }
         </Text>
       </Alert>
     );

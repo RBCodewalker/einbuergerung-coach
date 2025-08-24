@@ -16,6 +16,7 @@ export function AIProvider({ children }) {
   const [isModelReady, setIsModelReady] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState('');
   const [loadingError, setLoadingError] = useState(null);
+  const [isMobile] = useState(() => aiExplanationService.isMobile);
 
   useEffect(() => {
     // Start loading the AI model immediately when app starts
@@ -26,25 +27,34 @@ export function AIProvider({ children }) {
       }
 
       setIsModelLoading(true);
-      setLoadingProgress('KI-Modell wird geladen...');
+      const initialProgress = isMobile 
+        ? 'KI-Modell wird geladen... (kann auf Mobilgeräten länger dauern)'
+        : 'KI-Modell wird geladen...';
+      setLoadingProgress(initialProgress);
+      
+      let progressInterval;
       
       try {
-        // Hook into the service's progress reporting
-        const originalConsoleLog = console.log;
-        console.log = (message) => {
-          if (typeof message === 'string' && message.includes('WebLLM loading progress:')) {
-            setLoadingProgress(message.replace('WebLLM loading progress: ', ''));
+        // Hook into the service's progress reporting with better mobile support
+        progressInterval = setInterval(() => {
+          const progress = aiExplanationService.initializationProgress;
+          if (progress > 0) {
+            const progressText = isMobile
+              ? `Lädt... ${progress}% (Mobilgerät erkannt)`
+              : `Lädt... ${progress}%`;
+            setLoadingProgress(progressText);
           }
-          originalConsoleLog(message);
-        };
+        }, 500);
 
         await aiExplanationService.initialize();
         
-        // Restore console.log
-        console.log = originalConsoleLog;
+        clearInterval(progressInterval);
         
         setIsModelReady(true);
-        setLoadingProgress('KI-Modell erfolgreich geladen!');
+        const successMessage = isMobile 
+          ? 'KI-Modell erfolgreich geladen! (funktioniert auf Ihrem Mobilgerät)'
+          : 'KI-Modell erfolgreich geladen!';
+        setLoadingProgress(successMessage);
         
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -53,8 +63,17 @@ export function AIProvider({ children }) {
         
       } catch (error) {
         console.error('Failed to initialize AI model:', error);
-        setLoadingError('KI-Modell konnte nicht geladen werden. Fallback-Erklärungen werden verwendet.');
+        
+        const errorMessage = isMobile
+          ? 'KI-Funktionen sind auf Mobilgeräten möglicherweise nicht verfügbar. Die App funktioniert weiterhin ohne KI-Erklärungen.'
+          : 'KI-Modell konnte nicht geladen werden. Die App funktioniert weiterhin ohne KI-Erklärungen.';
+        
+        setLoadingError(errorMessage);
         setLoadingProgress('');
+        
+        if (progressInterval) {
+          clearInterval(progressInterval);
+        }
       } finally {
         setIsModelLoading(false);
       }
@@ -69,6 +88,7 @@ export function AIProvider({ children }) {
     isModelReady,
     loadingProgress,
     loadingError,
+    isMobile,
   };
 
   return (
