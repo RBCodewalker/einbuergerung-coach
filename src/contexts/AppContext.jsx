@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { useCookieState } from '../hooks/useCookieState';
+import { useStorageState } from '../hooks/useStorageState';
 import { useMantineColorScheme } from '@mantine/core';
 import { setCookie, getCookie } from '../utils/cookies';
 
@@ -18,9 +18,9 @@ export function AppProvider({ children }) {
   const [consent, setConsent] = useState(() => getCookie('lid.consent') || 'ask');
   const cookiesEnabled = consent === 'all';
 
-  // Theme management
+  // Theme management - use robust storage for better persistence
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const [dark, setDark] = useCookieState('lid.dark', colorScheme === 'dark', true);
+  const [dark, setDark] = useStorageState('lid.dark', colorScheme === 'dark', true);
 
   const handleConsentChange = (newConsent) => {
     setConsent(newConsent);

@@ -22,6 +22,7 @@ import { useQuiz } from "../contexts/QuizContext";
 import { useMediaQuery } from "@mantine/hooks";
 import { Clock2, FunnelX, GraduationCap, LibraryBig, ListTodo } from "lucide-react";
 import { AIModelStatus } from "../components/AIModelStatus";
+import { StorageDebug } from "../components/StorageDebug";
 
 export function DashboardPage() {
   const {
@@ -61,6 +62,9 @@ export function DashboardPage() {
     <Stack gap="xl">
       {/* AI Model Status */}
       <AIModelStatus />
+      
+      {/* Storage Debug Info (development only) */}
+      {process.env.NODE_ENV === 'development' && <StorageDebug />}
       
       {/* Branding Section */}
       <Center>
