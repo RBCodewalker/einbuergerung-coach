@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { useCookieState } from '../hooks/useCookieState';
+import { useStorageState } from '../hooks/useStorageState';
 import { useQuizData } from '../hooks/useQuizData';
 import { useQuizTimer } from '../hooks/useQuizTimer';
 import { useApp } from './AppContext';
 import { loadStateQuestions, getRandomStateQuestions, DEFAULT_STATE } from '../utils/stateQuestions';
+import { migrateFromCookies } from '../utils/storage';
 
 const QuizContext = createContext();
 
@@ -19,16 +20,33 @@ export function QuizProvider({ children }) {
   const { cookiesEnabled } = useApp();
   const { learnSet, getQuizSet } = useQuizData();
 
-  // Quiz state
-  const [mode, setMode] = useCookieState('lid.mode', 'dashboard', cookiesEnabled);
+  // Migrate from cookies to localStorage on first load
+  useEffect(() => {
+    migrateFromCookies();
+  }, []);
+
+  // Stats validator to ensure data integrity
+  const statsValidator = (stats) => {
+    return stats && 
+           typeof stats === 'object' && 
+           typeof stats.correct === 'number' && 
+           typeof stats.wrong === 'number' &&
+           typeof stats.totalSessions === 'number' &&
+           typeof stats.attempted === 'object' &&
+           typeof stats.correctAnswers === 'object' &&
+           typeof stats.incorrectAnswers === 'object';
+  };
+
+  // Quiz state - using robust storage for critical data
+  const [mode, setMode] = useStorageState('lid.mode', 'dashboard', cookiesEnabled);
   const [quizSeed, setQuizSeed] = useState(0);
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useCookieState('lid.answers', [], cookiesEnabled);
-  const [flags, setFlags] = useCookieState('lid.flags', [], cookiesEnabled);
+  const [answers, setAnswers] = useStorageState('lid.answers', [], cookiesEnabled);
+  const [flags, setFlags] = useStorageState('lid.flags', [], cookiesEnabled);
   const [showReview, setShowReview] = useState(false);
-  const [quizDuration, setQuizDuration] = useCookieState('lid.quizDuration', 0, cookiesEnabled); // in minutes
-  const [excludeCorrect, setExcludeCorrect] = useCookieState('lid.excludeCorrect', false, cookiesEnabled);
-  const [selectedState, setSelectedState] = useCookieState('lid.selectedState', DEFAULT_STATE, cookiesEnabled);
+  const [quizDuration, setQuizDuration] = useStorageState('lid.quizDuration', 0, cookiesEnabled);
+  const [excludeCorrect, setExcludeCorrect] = useStorageState('lid.excludeCorrect', false, cookiesEnabled);
+  const [selectedState, setSelectedState] = useStorageState('lid.selectedState', DEFAULT_STATE, cookiesEnabled);
   const [stateQuestions, setStateQuestions] = useState([]);
 
   // Load state questions when selectedState changes (always load since we always have a default state)
@@ -58,7 +76,7 @@ export function QuizProvider({ children }) {
     incorrectAnswers: {}, // Track which questions were answered incorrectly with their wrong choice
     learnedQuestions: {} // Track questions marked as learned/reviewed
   };
-  const [stats, setStats] = useCookieState('lid.stats', statsInit, cookiesEnabled);
+  const [stats, setStats] = useStorageState('lid.stats', statsInit, cookiesEnabled, statsValidator);
 
   // Clean up any existing duplicates between correctAnswers and incorrectAnswers
   useEffect(() => {
@@ -236,30 +254,6 @@ export function QuizProvider({ children }) {
     }));
   };
 
-  // Helper function to ensure stats integrity and mutual exclusivity
-  const validateAndCleanStats = (stats) => {
-    const correctIds = Object.keys(stats.correctAnswers || {});
-    const incorrectIds = Object.keys(stats.incorrectAnswers || {});
-    const duplicates = correctIds.filter(id => incorrectIds.includes(id));
-    
-    if (duplicates.length > 0) {
-      const newCorrectAnswers = { ...stats.correctAnswers };
-      const newIncorrectAnswers = { ...stats.incorrectAnswers };
-      
-      // Remove duplicates from incorrectAnswers (prioritize correct answers as latest state)
-      duplicates.forEach(id => {
-        delete newIncorrectAnswers[id];
-      });
-      
-      return {
-        ...stats,
-        correctAnswers: newCorrectAnswers,
-        incorrectAnswers: newIncorrectAnswers
-      };
-    }
-    
-    return stats;
-  };
 
   const startNewQuiz = () => {
     setQuizSeed(Date.now());
