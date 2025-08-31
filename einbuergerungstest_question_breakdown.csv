@@ -1,9 +1,11 @@
-Category,Question_Range,Number_of_Questions,Description
-History,Questions 1-68,68,German history from ancient times to modern reunification
-"Constitution, Holidays and Religion",Questions 69-98,30,"Basic Law (Grundgesetz), holidays, religious diversity"
-Germany,Questions 99-133,35,"Geography, federal states, general knowledge about Germany"
-Political System,Questions 134-213,80,"Government structure, democracy, political parties, elections"
-Judiciary System and Employment,Questions 214-246,33,"Legal system, courts, employment law, workers rights"
-"Education, Family and European Union",Questions 247-300,54,"Education system, family law, European Union"
-State-Specific Questions (per state),10 questions per state,10,Questions specific to each of the 16 federal states
-"New Questions (Jewish Life, Israel, Antisemitism)",10 additional questions,10,"Questions about Jewish life, Israel right to exist, antisemitism"
+Category,URL_Slug,Question_Range,Number_of_Questions,Description,Icon
+Geschichte Teil 1,geschichte-1,Questions 1-35,35,"German history first part - early history to 1933",📚
+Geschichte Teil 2,geschichte-2,Questions 36-68,33,"German history second part - 1933 to reunification",📖
+"Verfassung, Feiertage und Religion",verfassung,Questions 69-98,30,"Basic Law (Grundgesetz), holidays, religious diversity",⚖️
+Deutschland,deutschland,Questions 99-133,35,"Geography, federal states, general knowledge about Germany",🇩🇪
+Politisches System Teil 1,politik-1,Questions 134-173,40,"Government structure, democracy, political parties (Part 1)",🏛️
+Politisches System Teil 2,politik-2,Questions 174-213,40,"Elections, voting rights, political participation (Part 2)",🗳️
+Rechtssystem und Arbeit,recht,Questions 214-246,33,"Legal system, courts, employment law, workers rights",💼
+"Bildung, Familie und EU Teil 1",bildung-1,Questions 247-272,26,"Education system, schools, universities (Part 1)",🎓
+"Bildung, Familie und EU Teil 2",bildung-2,Questions 273-300,28,"Family law, European Union integration (Part 2)",👨‍👩‍👧‍👦
+Landesfragen,laender,Questions 301+,10 per state,"State-specific questions for each of the 16 federal states",📍

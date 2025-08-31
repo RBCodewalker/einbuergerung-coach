@@ -12,6 +12,7 @@ import {
 import { Brain, Languages } from "lucide-react";
 import { aiExplanationService } from "../services/aiExplanations";
 import { useAI } from "../contexts/AIContext";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 export function AIExplanation({
   question,
@@ -21,6 +22,7 @@ export function AIExplanation({
   disabled = false,
 }) {
   const { isModelReady, isModelLoading } = useAI();
+  const isMobileDevice = useIsMobile();
   const [explanation, setExplanation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -136,7 +138,7 @@ export function AIExplanation({
         handleGenerateExplanation();
       }
     }
-  }, [userIndex, question?.id, language, disabled, isLoading]);
+  }, [userIndex, question?.id, language, disabled, isLoading, handleGenerateExplanation]);
 
   const toggleLanguage = () => {
     if (isLoading) return; // Don't allow language switching while loading
@@ -156,6 +158,11 @@ export function AIExplanation({
     // Update language - this will trigger useEffect to regenerate
     setLanguage(newLanguage);
   };
+
+  // Hide AI features on mobile devices
+  if (isMobileDevice) {
+    return null;
+  }
 
   return (
     <Paper

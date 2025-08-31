@@ -5,6 +5,10 @@ import './index.css';
 import App from './App';
 const theme = createTheme({
   primaryColor: 'emerald',
+  fontFamily: 'Nunito, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
+  headings: {
+    fontFamily: 'Nunito, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif',
+  },
   colors: {
     emerald: [
       '#ecfdf5',

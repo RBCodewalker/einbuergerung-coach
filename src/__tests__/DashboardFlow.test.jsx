@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 
@@ -341,7 +341,7 @@ describe('Dashboard Flow', () => {
       });
     });
 
-    it('should show completion message when all questions correct and excluded', () => {
+    it('should show completion message when all questions correct and excluded', async () => {
       const allCorrectStats = { attempted: 300, correct: 300, wrong: 0, total: 300 };
 
       render(
@@ -352,7 +352,10 @@ describe('Dashboard Flow', () => {
 
       // Enable exclude correct first
       const excludeCheckbox = screen.getByLabelText(/Richtige Antworten ausschließen/);
-      excludeCheckbox.click();
+      
+      await act(async () => {
+        excludeCheckbox.click();
+      });
 
       expect(screen.getByText('🎉 Alle Fragen richtig beantwortet! Nichts mehr zu quizen.')).toBeInTheDocument();
     });

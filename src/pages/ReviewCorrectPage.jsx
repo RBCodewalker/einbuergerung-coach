@@ -15,16 +15,16 @@ import { getQuestionCategory } from '../utils/categories';
 import { getImageSrc } from '../utils/images';
 
 export function ReviewCorrectPage() {
-  const { learnSet, stats, selectedState } = useQuiz();
+  const { enhancedLearnSet, stats, selectedState } = useQuiz();
   const navigate = useNavigate();
 
   // Get questions that were answered correctly
-  const correctQuestions = (learnSet || []).filter((question) => {
+  const correctQuestions = (enhancedLearnSet || []).filter((question) => {
     return stats?.correctAnswers?.[question.id];
   });
 
   // Early return if data is not ready
-  if (!learnSet || !stats) {
+  if (!enhancedLearnSet || !stats) {
     return (
       <Stack gap="xl">
         <Group justify="space-between" align="center">

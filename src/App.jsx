@@ -9,12 +9,17 @@ import { HomeButton } from './components/ui/HomeButton';
 import { StateToggle } from './components/StateToggle';
 import { ConsentPage } from './pages/ConsentPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { CategoryOverviewPage } from './pages/CategoryOverviewPage';
 import { ReviewCorrectPage } from './pages/ReviewCorrectPage';
 import { ReviewIncorrectPage } from './pages/ReviewIncorrectPage';
+import { ReviewFlaggedPage } from './pages/ReviewFlaggedPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { LearnPageWrapper } from './components/routing/LearnPageWrapper';
+import { LearnModeWrapper } from './components/routing/LearnModeWrapper';
 import { QuizPageWrapper } from './components/routing/QuizPageWrapper';
 import { QuizReviewWrapper } from './components/routing/QuizReviewWrapper';
+import { ScrollToTop } from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function AppContent() {
   const { consent } = useApp();
@@ -46,11 +51,16 @@ function AppContent() {
 
       <Routes>
         <Route path="/" element={<DashboardPage />} />
+        {/* Legacy route for backward compatibility */}
         <Route path="/learn/:questionIndex" element={<LearnPageWrapper />} />
+        {/* New navigation structure */}
+        <Route path="/lernen/themenbereiche" element={<CategoryOverviewPage />} />
+        <Route path="/lernen/:mode/:questionIndex" element={<LearnModeWrapper />} />
         <Route path="/quiz/:questionIndex" element={<QuizPageWrapper />} />
         <Route path="/quiz/review" element={<QuizReviewWrapper />} />
         <Route path="/review-correct" element={<ReviewCorrectPage />} />
         <Route path="/review-incorrect" element={<ReviewIncorrectPage />} />
+        <Route path="/review-flagged" element={<ReviewFlaggedPage />} />
         <Route path="/not-found" element={<NotFoundPage />} />
         <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Routes>
@@ -67,21 +77,26 @@ function AppContent() {
         </a>
         .
       </Text>
+
+      {/* Global Scroll to Top Button */}
+      <ScrollToTop />
     </Container>
   );
 }
 
 function App() {
   return (
-    <Router>
-      <AppProvider>
-        <AIProvider>
-          <QuizProvider>
-            <AppContent />
-          </QuizProvider>
-        </AIProvider>
-      </AppProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AppProvider>
+          <AIProvider>
+            <QuizProvider>
+              <AppContent />
+            </QuizProvider>
+          </AIProvider>
+        </AppProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
