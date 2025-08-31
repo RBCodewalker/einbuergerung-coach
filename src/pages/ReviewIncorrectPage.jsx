@@ -17,12 +17,12 @@ import { getQuestionCategory } from '../utils/categories';
 import { getImageSrc } from '../utils/images';
 
 export function ReviewIncorrectPage() {
-  const { learnSet, stats, markAsLearned, unmarkAsLearned, selectedState } = useQuiz();
+  const { enhancedLearnSet, stats, markAsLearned, unmarkAsLearned, selectedState } = useQuiz();
   const navigate = useNavigate();
   const [showLearned, setShowLearned] = useState(false);
 
   // Get questions that were answered incorrectly
-  const allIncorrectQuestions = (learnSet || []).filter((question) => {
+  const allIncorrectQuestions = (enhancedLearnSet || []).filter((question) => {
     return stats?.incorrectAnswers?.[question.id] !== undefined;
   });
 
@@ -39,7 +39,7 @@ export function ReviewIncorrectPage() {
   const displayQuestions = showLearned ? allIncorrectQuestions : unlearnedIncorrectQuestions;
 
   // Early return if data is not ready
-  if (!learnSet || !stats) {
+  if (!enhancedLearnSet || !stats) {
     return (
       <Stack gap="xl">
         <Group justify="space-between" align="center">

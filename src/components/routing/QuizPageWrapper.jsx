@@ -1,17 +1,20 @@
+import React, { useEffect, useState } from 'react';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useQuiz } from '../../contexts/QuizContext';
 import { QuizPage } from '../../pages/QuizPage';
-import { useEffect, useState } from 'react';
-import { Modal, Text, Button, Group } from '@mantine/core';
+import { Modal, Text, Button, Group, Container, Loader, Stack } from '@mantine/core';
 
-export function QuizPageWrapper() {
+function QuizPageWrapperComponent() {
   const { questionIndex } = useParams();
   const navigate = useNavigate();
-  const { questions, setCurrent, setMode, mode, answers, startNewQuiz } = useQuiz();
+  // Only get the values we actually need to avoid unnecessary re-renders from timer updates
+  const quizContext = useQuiz();
+  const { questions, setCurrent, setMode, mode, answers, startNewQuiz, enhancedLearnSet } = quizContext;
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   
   const index = parseInt(questionIndex, 10);
   
+
   useEffect(() => {
     // Check if user is trying to access quiz without being in quiz mode
     if (mode !== 'quiz' || questions.length === 0) {
@@ -26,6 +29,18 @@ export function QuizPageWrapper() {
       setCurrent(index - 1);
     }
   }, [index, setCurrent, mode, questions.length]);
+
+  // Show loading state if core data hasn't loaded yet
+  if (enhancedLearnSet.length <= 2) {
+    return (
+      <Container size="sm" mt="xl">
+        <Stack align="center" gap="md">
+          <Loader size="md" />
+          <Text c="dimmed">Fragen werden geladen...</Text>
+        </Stack>
+      </Container>
+    );
+  }
 
   // Validate question index
   if (mode === 'quiz' && (isNaN(index) || index < 1 || index > questions.length)) {
@@ -73,3 +88,6 @@ export function QuizPageWrapper() {
 
   return <QuizPage />;
 }
+
+// Memoize the component to prevent re-renders when timer updates
+export const QuizPageWrapper = React.memo(QuizPageWrapperComponent);

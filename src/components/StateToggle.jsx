@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { Menu, Button, Text, Modal, Group } from '@mantine/core';
 import { MapPin, ChevronDown } from 'lucide-react';
 import { useDisclosure } from '@mantine/hooks';
+import { useLocation } from 'react-router-dom';
 import { getAvailableStates } from '../utils/stateQuestions';
 import { useQuiz } from '../contexts/QuizContext';
 
 export function StateToggle() {
   const { selectedState, setSelectedState, setStats, stats } = useQuiz();
+  const location = useLocation();
   const [opened, { open, close }] = useDisclosure(false);
   const [pendingState, setPendingState] = useState(null);
   const states = getAvailableStates();
   
   const currentStateName = states.find(s => s.key === selectedState)?.name || 'Baden-Württemberg';
+  
+  // Enable only on dashboard route, disable everywhere else
+  const isOnDashboard = location.pathname === '/';
 
   const handleStateClick = (stateKey, stateName) => {
     if (stateKey === selectedState) return; // No change needed
@@ -89,13 +94,14 @@ export function StateToggle() {
 
   return (
     <>
-      <Menu shadow="md" width={200}>
+      <Menu shadow="md" width={200} disabled={!isOnDashboard}>
         <Menu.Target>
           <Button 
             variant="light" 
             size="xs"
             leftSection={<MapPin size={14} />}
             rightSection={<ChevronDown size={14} />}
+            disabled={!isOnDashboard}
           >
             {currentStateName}
           </Button>

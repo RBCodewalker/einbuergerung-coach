@@ -1,11 +1,18 @@
 import React from 'react';
-import { Alert, Progress, Text, Group, ThemeIcon, Button } from '@mantine/core';
+import { Alert, Progress, Text, Group, Button } from '@mantine/core';
 import { Brain, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useAI } from '../contexts/AIContext';
 import { aiExplanationService } from '../services/aiExplanations';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export function AIModelStatus() {
   const { isModelLoading, isModelReady, loadingProgress, loadingError, isMobile } = useAI();
+  const isMobileDevice = useIsMobile();
+
+  // Hide AI features on mobile devices
+  if (isMobileDevice) {
+    return null;
+  }
 
   // Don't show anything if model is ready and no error
   if (isModelReady && !loadingError && !loadingProgress) {
