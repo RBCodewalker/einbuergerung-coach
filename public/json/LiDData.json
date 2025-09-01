@@ -665,7 +665,7 @@
       "vor etwa 1700 Jahren"
     ],
     "image": false,
-    "answerIndex": 1
+    "answerIndex": 3
   },
   {
     "id": 60,
@@ -739,7 +739,7 @@
       "Worms und Speyer"
     ],
     "image": false,
-    "answerIndex": 3
+    "answerIndex": 0
   },
   {
     "id": 67,
@@ -1084,7 +1084,7 @@
       "mit Freiheitsstrafe bis zu fünf Jahren oder mit Geldstrafe"
     ],
     "image": false,
-    "answerIndex": 1
+    "answerIndex": 3
   },
   {
     "id": 97,
@@ -1249,7 +1249,7 @@
       "der öffentliche Aufruf zur Vernichtung Israels"
     ],
     "image": false,
-    "answerIndex": 0
+    "answerIndex": 3
   },
   {
     "id": 112,
@@ -1670,7 +1670,7 @@
       "gegen Juden Fußball spielen"
     ],
     "image": false,
-    "answerIndex": 1
+    "answerIndex": 2
   },
   {
     "id": 150,
@@ -2016,7 +2016,7 @@
     "question": "Wie heißt das jüdische Gebetshaus?",
     "options": ["Basilika", "Moschee", "Synagoge", "Kirche"],
     "image": false,
-    "answerIndex": 0
+    "answerIndex": 2
   },
   {
     "id": 183,
@@ -2035,7 +2035,7 @@
       "ein Vorschlag der UdSSR"
     ],
     "image": false,
-    "answerIndex": 2
+    "answerIndex": 0
   },
   {
     "id": 185,
@@ -3148,7 +3148,7 @@
       "aus der christlichen Tradition"
     ],
     "image": false,
-    "answerIndex": 2
+    "answerIndex": 1
   },
   {
     "id": 289,
