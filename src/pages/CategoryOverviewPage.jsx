@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   Stack,
   Paper,
@@ -9,15 +9,42 @@ import {
   Badge,
   Progress,
   Box,
-  Center
+  Center,
+  ActionIcon,
+  Tooltip
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { useQuiz } from '../contexts/QuizContext';
 import { getAllCategories } from '../utils/categories';
+import { QuestionSearch } from '../components/QuestionSearch';
 
 export function CategoryOverviewPage() {
   const navigate = useNavigate();
   const { enhancedLearnSet, stats } = useQuiz();
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const handleQuestionSelect = (question) => {
+    // Find the global index of the selected question
+    const questionIndex = enhancedLearnSet.findIndex(q => q.id === question.id);
+    if (questionIndex !== -1) {
+      // Navigate to the question in alle fragen (1-based index for URL)
+      navigate(`/lernen/alle/${questionIndex + 1}`);
+    }
+  };
+
+  // Handle keyboard shortcut to open search
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        setIsSearchVisible(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Alle Kategorien mit Statistiken abrufen
   const categoriesWithStats = useMemo(() => {
@@ -120,14 +147,40 @@ export function CategoryOverviewPage() {
 
   return (
     <Stack gap="xl" mt="xl">
+      {/* Search Component */}
+      <QuestionSearch
+        questions={enhancedLearnSet}
+        isVisible={isSearchVisible}
+        onClose={() => setIsSearchVisible(false)}
+        onQuestionSelect={handleQuestionSelect}
+      />
+
       {/* Header */}
-      <Stack gap={4} mb="xl">
-        <Title order={1} size="h2">
-          Themenbereiche
-        </Title>
-        <Text c="dimmed" size="sm">
-          Wähle einen Themenbereich zum gezielten Lernen
-        </Text>
+      <Stack gap={4}>
+        <Group justify="space-between" align="flex-start">
+          <Stack gap={4}>
+            <Title order={1} size="h2">
+              Themenbereiche
+            </Title>
+            <Text c="dimmed" size="sm">
+              Wähle einen Themenbereich zum gezielten Lernen
+            </Text>
+          </Stack>
+          <Tooltip 
+            label="Fragen durchsuchen (Strg+K)"
+            position="bottom"
+            withArrow
+          >
+            <ActionIcon
+              variant="light"
+              color="blue"
+              size="lg"
+              onClick={() => setIsSearchVisible(true)}
+            >
+              <Search size={18} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
       </Stack>
 
       {/* Alle Fragen Option */}
