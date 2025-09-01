@@ -46,11 +46,25 @@ export const loadStateQuestions = async (stateKey) => {
   }
 };
 
-export const getRandomStateQuestions = (stateQuestions, count = 3) => {
+export const getRandomStateQuestions = (stateQuestions, count = 3, seed = null) => {
   if (!stateQuestions || stateQuestions.length === 0) {
     return [];
   }
   
+  // Use deterministic seed-based selection if provided, otherwise use Math.random
+  if (seed !== null) {
+    // Create a deterministic pseudo-random number generator based on seed
+    let seededRandom = seed;
+    const pseudoRandom = () => {
+      seededRandom = (seededRandom * 9301 + 49297) % 233280;
+      return seededRandom / 233280;
+    };
+    
+    const shuffled = [...stateQuestions].sort(() => pseudoRandom() - 0.5);
+    return shuffled.slice(0, Math.min(count, stateQuestions.length));
+  }
+  
+  // Fallback to non-deterministic for non-quiz scenarios
   const shuffled = [...stateQuestions].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, stateQuestions.length));
 };

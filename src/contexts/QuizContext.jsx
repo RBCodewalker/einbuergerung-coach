@@ -51,6 +51,9 @@ export function QuizProvider({ children }) {
   const [excludeCorrect, setExcludeCorrect] = useStorageState('lid.excludeCorrect', false, cookiesEnabled);
   const [selectedState, setSelectedState] = useStorageState('lid.selectedState', DEFAULT_STATE, cookiesEnabled);
   const [stateQuestions, setStateQuestions] = useState([]);
+  
+  // CRITICAL: Capture correctAnswers at quiz start to prevent question jumping during active quiz
+  const [quizStartCorrectAnswers, setQuizStartCorrectAnswers] = useState({});
 
   // Load state questions when selectedState changes (always load since we always have a default state)
   useEffect(() => {
@@ -224,7 +227,11 @@ export function QuizProvider({ children }) {
     // When in quiz mode, use the correctAnswers state from when quiz was STARTED, not current
     // This prevents questions from jumping when user selects answers during quiz
     const shouldExcludeCorrect = excludeCorrect && mode !== 'quiz';
-    const correctAnswersToExclude = shouldExcludeCorrect ? stats?.correctAnswers || {} : {};
+    const correctAnswersToExclude = shouldExcludeCorrect 
+      ? stats?.correctAnswers || {} 
+      : mode === 'quiz' 
+        ? quizStartCorrectAnswers  // Use snapshot from quiz start, not current stats
+        : {};
     const baseQuizSet = getQuizSet(quizSeed, correctAnswersToExclude);
     
     // Always include state questions when available
@@ -234,8 +241,8 @@ export function QuizProvider({ children }) {
         ? stateQuestions.filter(q => !correctAnswersToExclude[q.id])
         : stateQuestions;
       
-      // Get 3 random state questions for quiz mode
-      const selectedStateQuestions = getRandomStateQuestions(availableStateQuestions, 3);
+      // Get 3 random state questions for quiz mode - CRITICAL: Use quizSeed for deterministic selection
+      const selectedStateQuestions = getRandomStateQuestions(availableStateQuestions, 3, quizSeed);
       
       // Combine: take 30 regular questions + 3 state questions = 33 total
       const regularQuestions = baseQuizSet.slice(0, Math.max(0, 33 - selectedStateQuestions.length));
@@ -243,7 +250,7 @@ export function QuizProvider({ children }) {
     }
     
     return baseQuizSet;
-  }, [getQuizSet, quizSeed, excludeCorrect, mode, stats?.correctAnswers, stateQuestions]);
+  }, [getQuizSet, quizSeed, excludeCorrect, mode, stateQuestions, quizStartCorrectAnswers]);
   
   // Enhanced learn set that includes ALL state questions (always 310 total: 300 general + 10 state)
   const enhancedLearnSet = useMemo(() => {
@@ -417,9 +424,11 @@ export function QuizProvider({ children }) {
   const startNewQuiz = useCallback(() => {
     setQuizSeed(Date.now());
     setAnswers([]); // Reset answers for new quiz
-    setFlags([]); // Reset flags for new quiz  
+    setFlags([]); // Reset flags for new quiz
+    // CRITICAL FIX: Capture current correctAnswers to prevent quiz questions from changing during session
+    setQuizStartCorrectAnswers(stats?.correctAnswers || {});
     setMode('quiz');
-  }, [setAnswers, setFlags]);
+  }, [setAnswers, setFlags, stats?.correctAnswers]);
 
   const scoreSummary = useCallback(() => {
     let correct = 0, wrong = 0, empty = 0;
