@@ -216,7 +216,7 @@ export function QuestionSearch({
                             </Badge>
                           </Group>
                           
-                          <Text size="sm" lh={1.4}>
+                          <Text size="sm" lh={1.4} component="div">
                             {highlightText(question.question, matches)}
                           </Text>
                           
@@ -240,6 +240,7 @@ export function QuestionSearch({
                                       size="xs"
                                       c={index === question.correct ? 'green' : 'dimmed'}
                                       style={{ paddingLeft: '12px' }}
+                                      component="div"
                                     >
                                       {String.fromCharCode(65 + index)}: {highlightText(option, optionMatches)}
                                       {index === question.correct && (
@@ -269,11 +270,11 @@ export function QuestionSearch({
         )}
       </Stack>
 
-      <style jsx>{`
+      <style>{`
         .search-result-item:hover {
-          background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
-          transform: translateY(-1px);
-          box-shadow: var(--mantine-shadow-md);
+          background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6)) !important;
+          transform: translateY(-1px) !important;
+          box-shadow: var(--mantine-shadow-md) !important;
         }
       `}</style>
     </Paper>
