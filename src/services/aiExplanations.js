@@ -15,14 +15,6 @@ class AIExplanationService {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isSmallMobile = /iPhone|Android.*Mobile|BlackBerry|IEMobile/i.test(userAgent) && window.innerWidth <= 480;
     
-    console.log("📱 Mobile Detection:", {
-      userAgent: userAgent.substring(0, 100),
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-      isSmallMobile,
-      deviceMemory: navigator.deviceMemory || 'unknown',
-      hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
-    });
     
     // Only restrict very small mobile phones (under 480px width)
     return isSmallMobile;
@@ -43,13 +35,6 @@ class AIExplanationService {
     const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
     const hasWorker = typeof Worker !== 'undefined';
     
-    console.log("🔍 WebLLM Compatibility Check:", {
-      hasWasm,
-      hasWebGPU,
-      hasSharedArrayBuffer,
-      hasWorker,
-      crossOriginIsolated: window.crossOriginIsolated
-    });
 
     // WebLLM requires WebAssembly at minimum, WebGPU is preferred but not required
     return hasWasm && hasWorker;
@@ -81,12 +66,6 @@ class AIExplanationService {
 
     this.isLoading = true;
     this.initializationProgress = 0;
-    console.log("🚀 Starting WebLLM initialization...", { 
-      isMobile: this.isMobile,
-      userAgent: navigator.userAgent,
-      screenSize: `${window.innerWidth}x${window.innerHeight}`,
-      memory: navigator.deviceMemory ? `${navigator.deviceMemory}GB` : 'unknown'
-    });
 
     // Check WebLLM browser compatibility first
     const isWebLLMSupported = this.checkWebLLMSupport();
@@ -115,13 +94,11 @@ class AIExplanationService {
 
       const initProgressCallback = (report) => {
         this.initializationProgress = report.progress || 0;
-        console.log("📥 WebLLM loading progress:", report.text, `${this.initializationProgress}%`);
       };
 
       // Try models in order until one works
       for (const modelId of models) {
         try {
-          console.log(`🔄 Attempting to load model: ${modelId}`);
 
           this.engine = new webllm.MLCEngine();
 
@@ -156,7 +133,7 @@ class AIExplanationService {
             ]);
           } catch (timeoutError) {
             if (timeoutError.message.includes('timeout')) {
-              console.warn(`⏰ Model ${modelId} timed out, but continuing with verification...`);
+              console.warn(`Model ${modelId} timed out, continuing with verification`);
               // Don't immediately fail - try to verify if the model actually loaded
             } else {
               throw timeoutError;
@@ -164,7 +141,6 @@ class AIExplanationService {
           }
 
           // Verify the engine is working with a test
-          console.log("🧪 Testing model functionality...");
           const testResult = await this.engine.chat.completions.create({
             messages: [{ role: "user", content: "Test" }],
             temperature: 0.1,
@@ -176,21 +152,12 @@ class AIExplanationService {
           }
 
           this.isInitialized = true;
-          console.log(
-            `✅ WebLLM initialized and tested successfully with model: ${modelId}`
-          );
           break;
         } catch (modelError) {
-          console.warn(
-            `❌ Failed to load/test ${modelId}:`,
-            modelError.message,
-            { isMobile: this.isMobile }
-          );
           this.engine = null;
           
           // On mobile, provide more specific error context
           if (this.isMobile && modelError.message.includes('timeout')) {
-            console.warn("📱 Mobile timeout - this is common on mobile devices with limited resources");
           }
           
           continue;
@@ -198,17 +165,6 @@ class AIExplanationService {
       }
 
       if (!this.isInitialized) {
-        console.log("🔍 Final mobile capabilities check:", {
-          hasWebAssembly: typeof WebAssembly !== 'undefined',
-          hasWebGPU: navigator.gpu !== undefined,
-          hasSharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
-          crossOriginIsolated: window.crossOriginIsolated,
-          deviceMemory: navigator.deviceMemory || 'unknown',
-          connection: navigator.connection ? {
-            effectiveType: navigator.connection.effectiveType,
-            downlink: navigator.connection.downlink
-          } : 'unknown'
-        });
 
         const errorMsg = this.isMobile 
           ? "WebLLM requires WebAssembly and sufficient device resources. Some mobile browsers may not support all required features. The app continues to work without AI explanations."
@@ -216,15 +172,14 @@ class AIExplanationService {
         throw new Error(errorMsg);
       }
     } catch (error) {
-      console.error("🚨 WebLLM initialization result:", error.message);
+      console.error("WebLLM initialization failed:", error.message);
       this.isInitialized = false;
       this.engine = null;
       this.initializationProgress = 0;
       
       // Provide more helpful error context
       if (this.isMobile) {
-        console.log("📱 Mobile AI loading can take longer and may require multiple attempts");
-      }
+        }
       
       throw error;
     } finally {
@@ -251,32 +206,23 @@ class AIExplanationService {
       throw new Error('Image questions not supported by current AI model');
     }
 
-    console.log(
-      `🤖 AI Explanation Request: Language=${language}, Initialized=${
-        this.isInitialized
-      }, Engine=${!!this.engine}`
-    );
 
     try {
       // Wait for initialization if it's in progress
       if (this.initializationPromise) {
-        console.log("⏳ Waiting for model initialization to complete...");
         await this.initializationPromise;
       }
 
       // Try to initialize if not done yet
       if (!this.isInitialized && !this.initializationPromise) {
-        console.log("🔄 Starting model initialization...");
         await this.initialize();
       }
 
       // Double-check that everything is ready
       if (!this.isInitialized || !this.engine) {
-        console.warn("❌ Model not properly initialized");
         throw new Error("AI model not available");
       }
 
-      console.log("✅ Model ready, generating explanation...");
       const prompt = this.buildPrompt(
         questionText,
         options,
@@ -309,15 +255,8 @@ class AIExplanationService {
         }
 
         explanation = explanation.replace(/^["']|["']$/g, "").trim();
-        console.log(
-          `✅ Explanation generated successfully in ${language}: ${explanation.substring(
-            0,
-            50
-          )}...`
-        );
         return explanation;
       } catch (aiError) {
-        console.error("💥 AI generation error:", aiError.message);
 
         // Check if engine is still available after error
         if (!this.engine) {
@@ -333,7 +272,6 @@ class AIExplanationService {
         }
       }
     } catch (error) {
-      console.error("🚨 Final error in generateExplanation:", error.message);
       throw error;
     }
   }

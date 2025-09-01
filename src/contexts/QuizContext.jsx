@@ -111,10 +111,6 @@ export function QuizProvider({ children }) {
     const countsMatch = stats.correct === actualCorrect && stats.wrong === actualWrong;
     
     if (overlaps.length > 0 || !countsMatch) {
-      console.log('🔧 Data integrity fix needed:', {
-        overlaps: overlaps.length,
-        counts: { stored: { correct: stats.correct, wrong: stats.wrong }, actual: { correct: actualCorrect, wrong: actualWrong } }
-      });
       
       setStats(prevStats => {
         const newCorrectAnswers = { ...prevStats.correctAnswers };
@@ -173,12 +169,6 @@ export function QuizProvider({ children }) {
                        stats.wrong !== incorrectIds.length;
     
     if (needsFixing) {
-      console.log(`🔧 One-time migration: Fixing stats inconsistencies:`, {
-        duplicatesFound: duplicates.length,
-        missingFromAttempted: missingFromAttempted.length,
-        extraInAttempted: extraInAttempted.length,
-        beforeCounts: { correct: stats.correct, wrong: stats.wrong, attempted: attemptedIds.length }
-      });
       
       setStats(prevStats => {
         const newCorrectAnswers = { ...correctAnswers };
@@ -200,9 +190,6 @@ export function QuizProvider({ children }) {
           newAttempted[id] = true;
         });
         
-        console.log(`✅ Migration completed. Fixed stats:`, {
-          afterCounts: { correct: finalCorrectCount, wrong: finalWrongCount, attempted: Object.keys(newAttempted).length }
-        });
         
         return {
           ...prevStats,
@@ -213,8 +200,6 @@ export function QuizProvider({ children }) {
           attempted: newAttempted
         };
       });
-    } else {
-      console.log(`✅ Stats are already consistent, no migration needed.`);
     }
     
     // Mark migration as completed to prevent future runs
@@ -435,39 +420,19 @@ export function QuizProvider({ children }) {
     
     // Handle case where answers array is not properly initialized
     if (!Array.isArray(answers) || answers.length !== questions.length) {
-      console.warn('Answers array mismatch:', {
-        answersLength: answers?.length || 0,
-        questionsLength: questions.length,
-        answersType: typeof answers
-      });
       
       // If answers array is wrong size, treat all as empty
       return { correct: 0, wrong: 0, empty: questions.length, total: questions.length };
     }
     
-    // Debug logging
-    console.log('=== SCORE SUMMARY DEBUG ===');
-    console.log('Questions length:', questions.length);
-    console.log('Answers length:', answers.length);
-    console.log('Answers array:', answers);
-    
     questions.forEach((q, i) => {
       const userAnswer = answers[i];
       const correctAnswer = q.answerIndex;
-      
-      console.log(`Question ${i + 1}:`, {
-        userAnswer,
-        correctAnswer,
-        status: userAnswer === -1 ? 'empty' : userAnswer === correctAnswer ? 'correct' : 'wrong'
-      });
       
       if (userAnswer === -1 || userAnswer === undefined) empty++;
       else if (userAnswer === correctAnswer) correct++;
       else wrong++;
     });
-    
-    console.log('Final counts:', { correct, wrong, empty, total: questions.length });
-    console.log('=== END DEBUG ===');
     
     return { correct, wrong, empty, total: questions.length };
   }, [answers, questions]);

@@ -147,7 +147,7 @@ export function DashboardPage() {
     
     // Debug logging to track issues
     if (stats.correct !== actualCorrect || stats.wrong !== actualWrong || attemptedCount !== actualAttempted) {
-      console.warn('📊 Stats inconsistency detected:', {
+      console.warn('Stats inconsistency detected:', {
         stored: { correct: stats.correct, wrong: stats.wrong, attempted: attemptedCount },
         actual: { correct: actualCorrect, wrong: actualWrong, attempted: actualAttempted },
         totalQuestions,

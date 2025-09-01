@@ -48,9 +48,6 @@ export function AIExplanation({
       userIndex,
       language,
     };
-    console.log(
-      `Generating explanation in language: ${language}, userIndex: ${userIndex}`
-    );
 
     setIsLoading(true);
     setError("");
@@ -64,10 +61,6 @@ export function AIExplanation({
         language
       );
 
-      console.log(
-        `Generated explanation in ${language}:`,
-        result.substring(0, 50) + "..."
-      );
 
       setExplanation(result);
       setHasExplanation(true);

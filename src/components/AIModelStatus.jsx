@@ -65,7 +65,7 @@ export function AIModelStatus() {
         await aiExplanationService.initialize(true); // Force retry
         window.location.reload(); // Reload to reset state
       } catch (error) {
-        console.log('Retry failed:', error);
+        // Retry failed
       }
     };
 

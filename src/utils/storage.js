@@ -203,7 +203,6 @@ export function migrateFromCookies() {
         const localValue = localStorage.getItem(key);
         if (!localValue) {
           localStorage.setItem(key, cookieValue);
-          console.log(`Migrated ${key} from cookie to localStorage`);
           migrated = true;
         }
       } catch (error) {
@@ -214,7 +213,6 @@ export function migrateFromCookies() {
   
   if (migrated) {
     localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
-    console.log('Data migration from cookies completed');
   }
 }
 
