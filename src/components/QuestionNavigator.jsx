@@ -7,7 +7,8 @@ import {
   ActionIcon, 
   Text, 
   Paper,
-  Affix
+  Affix,
+  useMantineColorScheme
 } from '@mantine/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -23,6 +24,7 @@ export function QuestionNavigator({
 }) {
   const navigate = useNavigate();
   const { questionIndex } = useParams();
+  const { colorScheme } = useMantineColorScheme();
   
   // Touch and swipe states
   const [touchStart, setTouchStart] = useState(null);
@@ -363,7 +365,8 @@ export function QuestionNavigator({
                 alt="Swipe gesture"
                 style={{ 
                   width: '15px', 
-                  height: '15px'
+                  height: '15px',
+                  filter: colorScheme === 'dark' ? 'invert(1)' : 'none',
                 }}
               />
               <Text size="xs" c="dimmed">Wischen zum Navigieren</Text>
